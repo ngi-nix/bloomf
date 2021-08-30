@@ -4,6 +4,7 @@
 , changelog
 , maintainers
 , platforms
+, runFullTestSuite ? false
 }:
 { lib
 , ocamlPackages
@@ -31,6 +32,8 @@ let
     in
       any (file: baseName == file) filesToKeep ||
       any (dir: hasPrefix dir relativePath) directoriesToKeep;
+
+  duneTestCommand = if runFullTestSuite then "build @runtest-rand" else "runtest";
 in
 ocamlPackages.buildDunePackage {
   pname = "bloomf";
@@ -52,6 +55,11 @@ ocamlPackages.buildDunePackage {
   checkInputs = with ocamlPackages; [
     alcotest.out
   ];
+  checkPhase = ''
+    runHook preCheck
+    dune ${duneTestCommand} -p ${pname} ''${enableParallelBuilding:+-j $NIX_BUILD_CORES}
+    runHook postCheck
+  '';
 
   meta = {
     description = "Efficient Bloom filters for OCaml";
