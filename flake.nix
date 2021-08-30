@@ -8,8 +8,8 @@
 
   outputs = { self, nixpkgs, flake-utils }:
     let
-      inherit (builtins) substring attrNames mapAttrs attrValues;
-      inherit (nixpkgs.lib) listToAttrs getAttrs optionalAttrs;
+      inherit (builtins) substring attrNames mapAttrs attrValues filter;
+      inherit (nixpkgs.lib) getAttrs optionalAttrs hasPrefix forEach nameValuePair mapAttrs' foldl versionAtLeast removePrefix filterAttrs;
       inherit (flake-utils.lib) defaultSystems eachSystem;
 
       supportedSystems = defaultSystems;
@@ -37,19 +37,30 @@
       };
 
       packageNames = attrNames derivations;
+
+      ocamlScopeNames = filter (hasPrefix "ocamlPackages") (attrNames nixpkgs.legacyPackages.x86_64-linux.ocaml-ng);
+      supportedOcamlScopeNames = [ "ocamlPackages" "ocamlPackages_latest" ] ++
+          filter (n: versionAtLeast (removePrefix "ocamlPackages_" n) "4_06") ocamlScopeNames;
+
+      mergeSets = sets: foldl (l: r: l // r) {} sets;
     in
     {
-      overlays = mapAttrs
-        (name: drv:
-          (final: prev:
-            listToAttrs [
-              { name = name; value = drv final; }
-            ]
-          )
-        )
-        derivations;
+      overlays = mergeSets (forEach supportedOcamlScopeNames (ocamlScopeName:
+        mapAttrs' (name: drv:
+          nameValuePair
+          "${ocamlScopeName}-${name}"
+          (final: prev: {
+            ocaml-ng = prev.ocaml-ng // {
+              ${ocamlScopeName} = prev.ocaml-ng.${ocamlScopeName}.overrideScope'
+                (final': prev': {
+                  ${name} = drv { inherit (nixpkgs) lib; ocamlPackages = final'; };
+                });
+            };
+          })
+        ) derivations
+      ));
 
-      overlay = self.overlays.p2pcollab-bloomf;
+      overlay = self.overlays.ocamlPackages-p2pcollab-bloomf;
     } // eachSystem supportedSystems (system:
       let
         inherit (pkgs.stdenv) isLinux;
@@ -58,24 +69,33 @@
           inherit system;
           overlays = attrValues self.overlays;
         };
+
+        packages = mergeSets (forEach supportedOcamlScopeNames (ocamlScopeName:
+          mapAttrs' (name: drv:
+            nameValuePair
+            "${ocamlScopeName}-${name}"
+            drv
+          ) (getAttrs packageNames pkgs.ocaml-ng.${ocamlScopeName})
+        ));
+        defaultOcamlPackages = filterAttrs (n: v: hasPrefix "ocamlPackages-" n) packages;
       in
-      rec {
+      {
         checks = packages;
 
-        packages = getAttrs packageNames pkgs;
-        defaultPackage = pkgs.p2pcollab-bloomf;
+        inherit packages;
+        defaultPackage = packages.ocamlPackages-p2pcollab-bloomf;
 
         hydraJobs = {
-          build = packages;
+          build = defaultOcamlPackages;
         };
 
         devShell =
           let
-            packages' = attrValues packages;
+            packages = attrValues defaultOcamlPackages;
           in
           pkgs.mkShell {
-            packages = packages';
-            inputsFrom = packages';
+            inherit packages;
+            inputsFrom = packages;
           };
       });
 }
