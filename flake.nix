@@ -8,8 +8,8 @@
 
   outputs = { self, nixpkgs, flake-utils }:
     let
-      inherit (builtins) substring attrNames mapAttrs attrValues filter;
-      inherit (nixpkgs.lib) getAttrs optionalAttrs hasPrefix forEach nameValuePair mapAttrs' foldl versionAtLeast removePrefix filterAttrs;
+      inherit (builtins) substring attrNames mapAttrs attrValues filter tryEval;
+      inherit (nixpkgs.lib) getAttrs optionalAttrs hasPrefix forEach nameValuePair mapAttrs' foldl filterAttrs;
       inherit (flake-utils.lib) defaultSystems eachSystem;
 
       supportedSystems = defaultSystems;
@@ -39,13 +39,11 @@
       packageNames = attrNames derivations;
 
       ocamlScopeNames = filter (hasPrefix "ocamlPackages") (attrNames nixpkgs.legacyPackages.x86_64-linux.ocaml-ng);
-      supportedOcamlScopeNames = [ "ocamlPackages" "ocamlPackages_latest" ] ++
-          filter (n: versionAtLeast (removePrefix "ocamlPackages_" n) "4_06") ocamlScopeNames;
 
       mergeSets = sets: foldl (l: r: l // r) {} sets;
     in
     {
-      overlays = mergeSets (forEach supportedOcamlScopeNames (ocamlScopeName:
+      overlays = mergeSets (forEach ocamlScopeNames (ocamlScopeName:
         mapAttrs' (name: drv:
           nameValuePair
           "${ocamlScopeName}-${name}"
@@ -70,14 +68,17 @@
           overlays = attrValues self.overlays;
         };
 
-        packages = mergeSets (forEach supportedOcamlScopeNames (ocamlScopeName:
+        filterBrokenPackages = packages:
+          filterAttrs (_: drv: (tryEval drv.outPath).success) packages;
+
+        packages = mergeSets (forEach ocamlScopeNames (ocamlScopeName:
           mapAttrs' (name: drv:
             nameValuePair
             "${ocamlScopeName}-${name}"
             drv
-          ) (getAttrs packageNames pkgs.ocaml-ng.${ocamlScopeName})
+          ) (filterBrokenPackages (getAttrs packageNames pkgs.ocaml-ng.${ocamlScopeName}))
         ));
-        defaultOcamlPackages = filterAttrs (n: v: hasPrefix "ocamlPackages-" n) packages;
+        defaultOcamlPackages = filterAttrs (key: _: hasPrefix "ocamlPackages-" key) packages;
       in
       {
         checks = packages;
