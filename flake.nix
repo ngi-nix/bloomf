@@ -4,13 +4,25 @@
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-21.05";
     flake-utils.url = "github:numtide/flake-utils";
+    ocaml-flake-utils.url = "git+https://git.sr.ht/~ilkecan/ocaml-flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
+  outputs = { self, nixpkgs, flake-utils, ocaml-flake-utils }:
     let
-      inherit (builtins) substring attrNames mapAttrs attrValues filter tryEval;
-      inherit (nixpkgs.lib) getAttrs optionalAttrs hasPrefix forEach nameValuePair mapAttrs' foldl filterAttrs;
-      inherit (flake-utils.lib) defaultSystems eachSystem;
+      inherit (builtins)
+        attrNames
+        attrValues
+        substring
+      ;
+      inherit (flake-utils.lib)
+        defaultSystems
+        eachSystem
+      ;
+      inherit (ocaml-flake-utils.lib { inherit nixpkgs; })
+        createOverlays
+        getOcamlPackages
+        getOcamlPackagesFrom
+      ;
 
       supportedSystems = defaultSystems;
       year = substring 0 4 self.lastModifiedDate;
@@ -35,29 +47,9 @@
       derivations = {
         p2pcollab-bloomf = import ./nix/p2pcollab-bloomf.nix commonArgs;
       };
-
-      packageNames = attrNames derivations;
-
-      ocamlScopeNames = filter (hasPrefix "ocamlPackages") (attrNames nixpkgs.legacyPackages.x86_64-linux.ocaml-ng);
-
-      mergeSets = sets: foldl (l: r: l // r) {} sets;
     in
     {
-      overlays = mergeSets (forEach ocamlScopeNames (ocamlScopeName:
-        mapAttrs' (name: drv:
-          nameValuePair
-          "${ocamlScopeName}-${name}"
-          (final: prev: {
-            ocaml-ng = prev.ocaml-ng // {
-              ${ocamlScopeName} = prev.ocaml-ng.${ocamlScopeName}.overrideScope'
-                (final': prev': {
-                  ${name} = drv { inherit (nixpkgs) lib; ocamlPackages = final'; };
-                });
-            };
-          })
-        ) derivations
-      ));
-
+      overlays = createOverlays derivations { inherit (nixpkgs) lib; };
       overlay = self.overlays.ocamlPackages-p2pcollab-bloomf;
     } // eachSystem supportedSystems (system:
       let
@@ -68,22 +60,13 @@
           overlays = attrValues self.overlays;
         };
 
-        filterBrokenPackages = packages:
-          filterAttrs (_: drv: (tryEval drv.outPath).success) packages;
-
-        packages = mergeSets (forEach ocamlScopeNames (ocamlScopeName:
-          mapAttrs' (name: drv:
-            nameValuePair
-            "${ocamlScopeName}-${name}"
-            drv
-          ) (filterBrokenPackages (getAttrs packageNames pkgs.ocaml-ng.${ocamlScopeName}))
-        ));
-        defaultOcamlPackages = filterAttrs (key: _: hasPrefix "ocamlPackages-" key) packages;
+        packageNames = attrNames derivations;
+        defaultOcamlPackages = getOcamlPackagesFrom pkgs packageNames "ocamlPackages";
       in
-      {
+      rec {
         checks = packages;
 
-        inherit packages;
+        packages = getOcamlPackages pkgs packageNames;
         defaultPackage = packages.ocamlPackages-p2pcollab-bloomf;
 
         hydraJobs = {
