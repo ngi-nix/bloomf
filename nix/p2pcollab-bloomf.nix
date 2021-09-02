@@ -7,39 +7,30 @@
 , runFullTestSuite ? false
 }:
 { lib
+, filterSource
 , ocamlPackages
 , ...
 }:
 
 let
-  inherit (builtins) any;
-  inherit (lib) cleanSourceWith removePrefix hasPrefix;
-
-  src = ./..;
   pname = "bloomf";
-  packageName = "p2pcollab-${pname}";
-
-  directoriesToKeep = [ "/src" "/test" ];
-  filesToKeep = [
-    "${pname}.opam"
-    "dune-project"
-  ];
-
-  sourceFilter = name: type:
-    let
-      baseName = baseNameOf (toString name);
-      relativePath = removePrefix (toString src) name;
-    in
-      any (file: baseName == file) filesToKeep ||
-      any (dir: hasPrefix dir relativePath) directoriesToKeep;
-
   duneTestCommand = if runFullTestSuite then "build @runtest-rand" else "runtest";
 in
 ocamlPackages.buildDunePackage {
-  pname = "bloomf";
-  inherit version;
+  inherit pname version;
 
-  src = cleanSourceWith { inherit src; filter = sourceFilter; name = packageName; };
+  src = filterSource {
+    src = ./..;
+    directoriesToKeep = [
+      "/src"
+      "/test"
+    ];
+    filesToKeep = [
+      "${pname}.opam"
+      "dune-project"
+    ];
+    name = "p2pcollab-${pname}";
+  };
 
   minimumOCamlVersion = "4.03";
   useDune2 = true;

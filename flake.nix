@@ -5,10 +5,11 @@
     nixpkgs.url = "nixpkgs/nixos-21.05";
     flake-utils.url = "github:numtide/flake-utils";
     ocaml-flake-utils.url = "git+https://git.sr.ht/~ilkecan/ocaml-flake-utils";
+    source-utils.url = "git+https://git.sr.ht/~ilkecan/source-utils";
     version-utils.url = "git+https://git.sr.ht/~ilkecan/version-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils, ocaml-flake-utils, version-utils }:
+  outputs = { self, nixpkgs, flake-utils, ocaml-flake-utils, source-utils, version-utils }:
     let
       inherit (builtins)
         attrNames
@@ -22,6 +23,9 @@
         createOverlays
         getOcamlPackages
         getOcamlPackagesFrom
+      ;
+      inherit (source-utils.lib { inherit (nixpkgs) lib; })
+        filterSource
       ;
       inherit (version-utils.lib)
         getUnstableVersion
@@ -49,7 +53,7 @@
       };
     in
     {
-      overlays = createOverlays derivations { inherit (nixpkgs) lib; };
+      overlays = createOverlays derivations { inherit (nixpkgs) lib; inherit filterSource; };
       overlay = self.overlays.ocamlPackages-p2pcollab-bloomf;
     } // eachSystem supportedSystems (system:
       let

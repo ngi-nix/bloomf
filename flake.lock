@@ -50,7 +50,23 @@
         "flake-utils": "flake-utils",
         "nixpkgs": "nixpkgs",
         "ocaml-flake-utils": "ocaml-flake-utils",
+        "source-utils": "source-utils",
         "version-utils": "version-utils"
+      }
+    },
+    "source-utils": {
+      "locked": {
+        "lastModified": 1630618153,
+        "narHash": "sha256-qTbSQaVXp+tdeUMJVZyECNl26ScU3vbx1o4+sCCwH2A=",
+        "ref": "master",
+        "rev": "6b7201b3fedd5f927a13e7cf97769563c2ff0103",
+        "revCount": 1,
+        "type": "git",
+        "url": "https://git.sr.ht/~ilkecan/source-utils"
+      },
+      "original": {
+        "type": "git",
+        "url": "https://git.sr.ht/~ilkecan/source-utils"
       }
     },
     "version-utils": {
