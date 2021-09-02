@@ -5,14 +5,14 @@
     nixpkgs.url = "nixpkgs/nixos-21.05";
     flake-utils.url = "github:numtide/flake-utils";
     ocaml-flake-utils.url = "git+https://git.sr.ht/~ilkecan/ocaml-flake-utils";
+    version-utils.url = "git+https://git.sr.ht/~ilkecan/version-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils, ocaml-flake-utils }:
+  outputs = { self, nixpkgs, flake-utils, ocaml-flake-utils, version-utils }:
     let
       inherit (builtins)
         attrNames
         attrValues
-        substring
       ;
       inherit (flake-utils.lib)
         defaultSystems
@@ -23,13 +23,13 @@
         getOcamlPackages
         getOcamlPackagesFrom
       ;
+      inherit (version-utils.lib)
+        getUnstableVersion
+      ;
 
       supportedSystems = defaultSystems;
-      year = substring 0 4 self.lastModifiedDate;
-      month = substring 4 2 self.lastModifiedDate;
-      day = substring 6 2 self.lastModifiedDate;
       commonArgs = {
-        version = "unstable-${year}-${month}-${day}";
+        version = getUnstableVersion self.lastModifiedDate;
         homepage = "https://p2pcollab.net/";
         downloadPage = "https://github.com/p2pcollab/bloomf/releases";
         changelog = "https://raw.githubusercontent.com/p2pcollab/bloomf/master/CHANGES.md";
