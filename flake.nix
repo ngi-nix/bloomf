@@ -4,12 +4,12 @@
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-21.05";
     flake-utils.url = "github:numtide/flake-utils";
-    ocaml-flake-utils.url = "git+https://git.sr.ht/~ilkecan/ocaml-flake-utils";
+    ocaml-utils.url = "git+https://git.sr.ht/~ilkecan/ocaml-utils";
     source-utils.url = "git+https://git.sr.ht/~ilkecan/source-utils";
     version-utils.url = "git+https://git.sr.ht/~ilkecan/version-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils, ocaml-flake-utils, source-utils, version-utils }:
+  outputs = { self, nixpkgs, flake-utils, ocaml-utils, source-utils, version-utils }:
     let
       inherit (builtins)
         attrNames
@@ -19,7 +19,7 @@
         defaultSystems
         eachSystem
       ;
-      inherit (ocaml-flake-utils.lib { inherit nixpkgs; })
+      inherit (ocaml-utils.lib { inherit nixpkgs; })
         createOverlays
         getOcamlPackages
         getOcamlPackagesFrom

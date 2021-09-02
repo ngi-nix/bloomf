@@ -30,7 +30,7 @@
         "type": "indirect"
       }
     },
-    "ocaml-flake-utils": {
+    "ocaml-utils": {
       "locked": {
         "lastModified": 1630520319,
         "narHash": "sha256-AVpW2F3azK6t4E81Zd1EBHTAClPsl1YfQrcKeNjomlw=",
@@ -38,18 +38,18 @@
         "rev": "9ed0a5a370ae487f1a65039cb6c11339d56f3837",
         "revCount": 1,
         "type": "git",
-        "url": "https://git.sr.ht/~ilkecan/ocaml-flake-utils"
+        "url": "https://git.sr.ht/~ilkecan/ocaml-utils"
       },
       "original": {
         "type": "git",
-        "url": "https://git.sr.ht/~ilkecan/ocaml-flake-utils"
+        "url": "https://git.sr.ht/~ilkecan/ocaml-utils"
       }
     },
     "root": {
       "inputs": {
         "flake-utils": "flake-utils",
         "nixpkgs": "nixpkgs",
-        "ocaml-flake-utils": "ocaml-flake-utils",
+        "ocaml-utils": "ocaml-utils",
         "source-utils": "source-utils",
         "version-utils": "version-utils"
       }
