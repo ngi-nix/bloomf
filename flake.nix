@@ -55,8 +55,6 @@
       overlay = self.overlays.ocamlPackages-p2pcollab-bloomf;
     } // eachSystem supportedSystems (system:
       let
-        inherit (pkgs.stdenv) isLinux;
-
         pkgs = import nixpkgs {
           inherit system;
           overlays = attrValues self.overlays;
