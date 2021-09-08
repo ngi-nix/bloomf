@@ -5,11 +5,13 @@
     nixpkgs.url = "nixpkgs/nixos-21.05";
     flake-utils.url = "github:numtide/flake-utils";
     nix-filter.url = "github:numtide/nix-filter";
-    ocaml-utils.url = "git+https://git.sr.ht/~ilkecan/ocaml-utils";
-    version-utils.url = "git+https://git.sr.ht/~ilkecan/version-utils";
+    nix-utils = {
+      url = "git+https://git.sr.ht/~ilkecan/nix-utils";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, flake-utils, ocaml-utils, version-utils, ... }@inputs:
+  outputs = { self, nixpkgs, flake-utils, nix-utils, ... }@inputs:
     let
       inherit (builtins)
         attrNames
@@ -20,12 +22,10 @@
         eachSystem
       ;
       nix-filter = inputs.nix-filter.lib;
-      inherit (ocaml-utils.lib { inherit nixpkgs; })
-        createOverlays
+      inherit (nix-utils.lib)
+        createOcamlOverlays
         getOcamlPackages
         getOcamlPackagesFrom
-      ;
-      inherit (version-utils.lib)
         getUnstableVersion
       ;
 
@@ -51,7 +51,7 @@
       };
     in
     {
-      overlays = createOverlays derivations { inherit (nixpkgs) lib; inherit nix-filter; };
+      overlays = createOcamlOverlays derivations { inherit nix-filter; };
       overlay = self.overlays.ocamlPackages-p2pcollab-bloomf;
     } // eachSystem supportedSystems (system:
       let

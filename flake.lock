@@ -30,6 +30,26 @@
         "type": "github"
       }
     },
+    "nix-utils": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1631115497,
+        "narHash": "sha256-q2OzkBy9sQkm6WaXVAJDWwxqn3rnFzdiW79BUmMbKLI=",
+        "ref": "master",
+        "rev": "78571a9b61913143d34a5b692691f52845a6dd18",
+        "revCount": 2,
+        "type": "git",
+        "url": "https://git.sr.ht/~ilkecan/nix-utils"
+      },
+      "original": {
+        "type": "git",
+        "url": "https://git.sr.ht/~ilkecan/nix-utils"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1629880082,
@@ -45,43 +65,12 @@
         "type": "indirect"
       }
     },
-    "ocaml-utils": {
-      "locked": {
-        "lastModified": 1630520319,
-        "narHash": "sha256-AVpW2F3azK6t4E81Zd1EBHTAClPsl1YfQrcKeNjomlw=",
-        "ref": "master",
-        "rev": "9ed0a5a370ae487f1a65039cb6c11339d56f3837",
-        "revCount": 1,
-        "type": "git",
-        "url": "https://git.sr.ht/~ilkecan/ocaml-utils"
-      },
-      "original": {
-        "type": "git",
-        "url": "https://git.sr.ht/~ilkecan/ocaml-utils"
-      }
-    },
     "root": {
       "inputs": {
         "flake-utils": "flake-utils",
         "nix-filter": "nix-filter",
-        "nixpkgs": "nixpkgs",
-        "ocaml-utils": "ocaml-utils",
-        "version-utils": "version-utils"
-      }
-    },
-    "version-utils": {
-      "locked": {
-        "lastModified": 1630609559,
-        "narHash": "sha256-8ia1O259373WtT+dlQbeNrFvM6MUhxFfgVEGYxrbSxY=",
-        "ref": "master",
-        "rev": "2caa6fef96488b6e10de0bb822e6fb1cc0b9e04e",
-        "revCount": 1,
-        "type": "git",
-        "url": "https://git.sr.ht/~ilkecan/version-utils"
-      },
-      "original": {
-        "type": "git",
-        "url": "https://git.sr.ht/~ilkecan/version-utils"
+        "nix-utils": "nix-utils",
+        "nixpkgs": "nixpkgs"
       }
     }
   },
