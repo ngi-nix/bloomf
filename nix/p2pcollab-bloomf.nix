@@ -7,27 +7,27 @@
 , runFullTestSuite ? false
 }:
 { lib
-, filterSource
+, nix-filter
 , ocamlPackages
 , ...
 }:
 
 let
+  inherit (nix-filter) inDirectory;
+
   pname = "bloomf";
   duneTestCommand = if runFullTestSuite then "build @runtest-rand" else "runtest";
 in
 ocamlPackages.buildDunePackage {
   inherit pname version;
 
-  src = filterSource {
-    src = ./..;
-    directoriesToKeep = [
-      "/src"
-      "/test"
-    ];
-    filesToKeep = [
+  src = nix-filter {
+    root = ./..;
+    include = [
       "${pname}.opam"
       "dune-project"
+      (inDirectory "src")
+      (inDirectory "test")
     ];
     name = "p2pcollab-${pname}";
   };
