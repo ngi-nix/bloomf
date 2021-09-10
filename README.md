@@ -18,6 +18,14 @@ Online documentation is available [here](https://mirage.github.io/bloomf/).
 
 Alternatively, you can build from sources with `make` or `dune build`.
 
+### Nix
+You can buid the project for different OCaml versions using the [Nix package
+manager][nix]. To list the supported versions, run `nix flake show`. For
+example, to build the project for OCaml version 4.12, run `nix build
+'.#ocamlPackages_4_12-p2pcollab-bloomf'`.
+
+[nix]: https://nixos.org/
+
 ## Tests
 
 Some of the tests, measuring false positive rate or size estimation, might fail
