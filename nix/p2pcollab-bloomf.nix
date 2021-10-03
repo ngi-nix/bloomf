@@ -4,33 +4,22 @@
 , changelog
 , maintainers
 , platforms
+, source
 , runFullTestSuite ? false
 }:
 { lib
-, nix-filter
 , ocamlPackages
 , ...
 }:
 
 let
-  inherit (nix-filter) inDirectory;
-
   pname = "bloomf";
   duneTestCommand = if runFullTestSuite then "build @runtest-rand" else "runtest";
 in
 ocamlPackages.buildDunePackage {
   inherit pname version;
 
-  src = nix-filter {
-    root = ./..;
-    include = [
-      "${pname}.opam"
-      "dune-project"
-      (inDirectory "src")
-      (inDirectory "test")
-    ];
-    name = "p2pcollab-${pname}";
-  };
+  src = source;
 
   minimumOCamlVersion = "4.03";
   useDune2 = true;

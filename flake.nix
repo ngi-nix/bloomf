@@ -4,10 +4,13 @@
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-21.05";
     flake-utils.url = "github:numtide/flake-utils";
-    nix-filter.url = "github:numtide/nix-filter";
     nix-utils = {
       url = "git+https://git.sr.ht/~ilkecan/nix-utils";
       inputs.nixpkgs.follows = "nixpkgs";
+    };
+    source = {
+      url = "github:p2pcollab/bloomf";
+      flake = false;
     };
   };
 
@@ -21,7 +24,6 @@
         defaultSystems
         eachSystem
       ;
-      nix-filter = inputs.nix-filter.lib;
       inherit (nix-utils.lib)
         createOcamlOverlays
         getOcamlPackages
@@ -31,6 +33,7 @@
 
       supportedSystems = defaultSystems;
       commonArgs = {
+        source = inputs.source.outPath;
         version = getUnstableVersion self.lastModifiedDate;
         homepage = "https://p2pcollab.net/";
         downloadPage = "https://github.com/p2pcollab/bloomf/releases";
@@ -51,7 +54,7 @@
       };
     in
     {
-      overlays = createOcamlOverlays derivations { inherit nix-filter; };
+      overlays = createOcamlOverlays derivations { };
       overlay = self.overlays.ocamlPackages-p2pcollab-bloomf;
     } // eachSystem supportedSystems (system:
       let

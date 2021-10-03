@@ -15,21 +15,6 @@
         "type": "github"
       }
     },
-    "nix-filter": {
-      "locked": {
-        "lastModified": 1620202920,
-        "narHash": "sha256-BOkm3eKT45Dk4NNxJT0xL9NnyYeZcF+t79zPnJkggac=",
-        "owner": "numtide",
-        "repo": "nix-filter",
-        "rev": "3c9e33ed627e009428197b07216613206f06ed80",
-        "type": "github"
-      },
-      "original": {
-        "owner": "numtide",
-        "repo": "nix-filter",
-        "type": "github"
-      }
-    },
     "nix-utils": {
       "inputs": {
         "nixpkgs": [
@@ -68,9 +53,25 @@
     "root": {
       "inputs": {
         "flake-utils": "flake-utils",
-        "nix-filter": "nix-filter",
         "nix-utils": "nix-utils",
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": "nixpkgs",
+        "source": "source"
+      }
+    },
+    "source": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1571862273,
+        "narHash": "sha256-T4bYkfADhOIwfVsw8djj47vuuXKa/limX3WLs6JDlFw=",
+        "owner": "p2pcollab",
+        "repo": "bloomf",
+        "rev": "cbffe83255cb12f5117825f8f8ebf363e18bd627",
+        "type": "github"
+      },
+      "original": {
+        "owner": "p2pcollab",
+        "repo": "bloomf",
+        "type": "github"
       }
     }
   },
