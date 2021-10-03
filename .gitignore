@@ -1,6 +1,2 @@
-_build
-*.install
-*.merlin
-
 # nix build
 /result*

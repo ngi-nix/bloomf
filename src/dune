@@ -1,4 +1,0 @@
-(library
- (public_name bloomf)
- (name bloomf)
- (libraries bitv))
