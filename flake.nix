@@ -6,7 +6,7 @@
     flake-utils.url = "github:numtide/flake-utils";
     nix-filter.url = "github:numtide/nix-filter";
     nix-utils = {
-      url = "git+https://git.sr.ht/~ilkecan/nix-utils";
+      url = "sourcehut:~ilkecan/nix-utils";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
